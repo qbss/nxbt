@@ -13,13 +13,12 @@ I think this is now done. Feel free to use it. I'll tweak it here and there, add
 
 Tested as working on Linux Mint 18.2 with the Mate desktop environment.
 
-  Requirements:
-  
-  XBT should run on any currently supported Linux distribution with BASH. The dedicated USB drive must be formatted to a Linux native file system such as Ext4 to ensure that file permissions will be stored unchanged.
-  
-  …And away we go!
-
-                           - Joe Collins
+Quoting Joe Collins from XBT, which still applies mostly here:
+> Requirements:
+> 
+> XBT should run on any currently supported Linux distribution with BASH. The dedicated USB drive must be formatted to a Linux native file system such as Ext4 to ensure that file permissions will be stored unchanged.
+> 
+> …And away we go!
 
 #----------------------------------------------------------------------------------
 
