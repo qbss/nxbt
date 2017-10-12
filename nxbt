@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Sun  8 Oct 20:16:11 BST 2017
+# Last Change       - Thu 12 Oct 16:57:20 BST 2017
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ USAGE(){
 	while read -r; do
 		echo "$REPLY"
 	done <<-EOF
-		            NXBT - NEW XBT (8th October 2017)
+		            NXBT - NEW XBT (12th October 2017)
 		            Written by terminalforlife (terminalforlife@yahoo.com)
 		
 		            A fork and improvement of the XBT program written by Joe Collins.
@@ -172,9 +172,9 @@ while read -r; do
 	echo "$REPLY"
 done <<-EOF
 
-	+—————–––––––––––+
+	+————————————————+
 	| All backed up! |
-	+—————–––––––––––+
+	+————————————————+
 
 	TIME: ${SECONDS:-???}s
 	LINE: ${ERRCOUNT:-???}
