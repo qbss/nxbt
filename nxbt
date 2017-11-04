@@ -3,15 +3,15 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Thu 12 Oct 16:57:20 BST 2017
+# Last Change       - Sat  4 Nov 15:09:43 GMT 2017
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
 
 declare -i SECONDS=0
 
-XERR(){ echo "[L${1}] ERROR: $2" 1>&2; exit 1; }
-ERR(){ echo "[L${1}] ERROR: $2" 1>&2; }
+XERR(){ printf "[L%0.4d] ERROR: %s\n" "$1" "$2" 1>&2; exit 1; }
+ERR(){ printf "[L%0.4d] ERROR: %s\n" "$1" "$2" 1>&2; }
 
 declare -i DEPCOUNT=0
 for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
@@ -29,7 +29,7 @@ USAGE(){
 	while read -r; do
 		echo "$REPLY"
 	done <<-EOF
-		            NXBT - NEW XBT (12th October 2017)
+		            NXBT - NEW XBT (4th November 2017)
 		            Written by terminalforlife (terminalforlife@yahoo.com)
 		
 		            A fork and improvement of the XBT program written by Joe Collins.
@@ -80,9 +80,7 @@ while [ -n "$1" ]; do
 
 			[ -d "${1%\/*}" ] && {
 				ANDSOURCE="true" SOURCE+=( "$1")
-			} || {
-				XERR "$LINENO" "Source directory not found."
-			} ;;
+			} || XERR "$LINENO" "Source directory not found." ;;
 		*)
 			break ;;
 	esac
@@ -153,7 +151,7 @@ USER_PATH(){
 printf "[+%0.7d] SYNCHRONIZING...\n" "$SECONDS"
 /bin/sync 
 
-([ -f "$LOGFILE" ] || ERR "$LINENO" "Logfile not found.") || {
+[ -f "$LOGFILE" ] && {
 	readarray REPLY < "$LOGFILE"
 
 	[ -n "${REPLY[*]}" ] && {
@@ -161,10 +159,8 @@ printf "[+%0.7d] SYNCHRONIZING...\n" "$SECONDS"
 			"${TARGET}${BACKNAME}/${LOGFILE//*\/}"
 
 		< "$LOGFILE" > "${TARGET}${BACKNAME}/${LOGFILE//*\/}"
-	} || {
-		printf "[+%0.7d] CLEANING: %s\n" "$SECONDS" "$LOGFILE"
-	}
-}
+	} || printf "[+%0.7d] CLEANING: %s\n" "$SECONDS" "$LOGFILE"
+} || XERR "$LINENO" "Logfile not found."
 
 #TODO - Add feature to show the line count of the logfile.
 
