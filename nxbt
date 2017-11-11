@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Sat  4 Nov 15:09:43 GMT 2017
+# Last Change       - Sat 11 Nov 01:30:13 GMT 2017
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
@@ -23,13 +23,11 @@ for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
 
 [ $DEPCOUNT -eq 0 ] || exit 1
 
-shopt -s extglob
-
 USAGE(){
 	while read -r; do
-		echo "$REPLY"
+		printf "%s\n" "$REPLY"
 	done <<-EOF
-		            NXBT - NEW XBT (4th November 2017)
+		            NXBT - NEW XBT (11th November 2017)
 		            Written by terminalforlife (terminalforlife@yahoo.com)
 		
 		            A fork and improvement of the XBT program written by Joe Collins.
@@ -98,7 +96,7 @@ TARGET="$*"
 [ -f "$TARGET" ] && XERR "Target is not a directory."
 [[ "$TARGET" == */ ]] || TARGET+="/"
 
-CURDATE=`printf '%(%F_%X)T'`
+printf -v CURDATE "%(%F_%X)T" "-1"
 #TODO - Make the logfile skip the whole /tmp part; redundant.
 LOGFILE="/tmp/nxbt_${USER}_${CURDATE}.log"
 BACKNAME="NXBT_${UID}_${CURDATE}"
@@ -139,6 +137,7 @@ USER_PATH(){
 
 		/usr/bin/rsync -a --delete --info=progress2\
 			"$SOURCE" "$TARGETPATH"/ 2> "$LOGFILE"
+	}
 }
 
 # Use either custom path alone, or custom path plus defaults.
@@ -165,7 +164,7 @@ printf "[+%0.7d] SYNCHRONIZING...\n" "$SECONDS"
 #TODO - Add feature to show the line count of the logfile.
 
 while read -r; do
-	echo "$REPLY"
+	printf "%s\n" "$REPLY"
 done <<-EOF
 
 	+————————————————+
@@ -175,5 +174,3 @@ done <<-EOF
 	TIME: ${SECONDS:-???}s
 	LINE: ${ERRCOUNT:-???}
 EOF
-
-[ "$DEBUGME" == "true" ] && set +xeu || exit 0
