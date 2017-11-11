@@ -1,6 +1,11 @@
 # nxbt
 A fork and improvement of the XBT program written by Joe Collins.
 
+**MASTER** - _Hopefully stable branch._\
+**DEV** - _Development Branch (latest changes)_
+
+I will eventually incorporate this method to all of my repositories, but that will _definitely_ take time.
+
 INTRODUCTION
 ------------
 
