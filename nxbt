@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Sat 11 Nov 01:30:13 GMT 2017
+# Last Change       - Mon 29 Jan 23:51:34 GMT 2018
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ USAGE(){
 	while read -r; do
 		printf "%s\n" "$REPLY"
 	done <<-EOF
-		            NXBT - NEW XBT (11th November 2017)
+		            NXBT - NEW XBT (29th January 2018)
 		            Written by terminalforlife (terminalforlife@yahoo.com)
 		
 		            A fork and improvement of the XBT program written by Joe Collins.
@@ -50,10 +50,7 @@ USAGE(){
 	EOF
 }
 
-SOURCE=""
-ANDSOURCE=""
-
-while [ -n "$1" ]; do
+while [ "$1" ]; do
 	case "$1" in
 		--help|-h|-\?)
 			USAGE; exit 0 ;;
@@ -64,21 +61,27 @@ while [ -n "$1" ]; do
 		--logfile|-l)
 			shift
 
-			[ -d "${1%\/*}" ] && LOGFILE="$1" || {
+			if [ -d "${1%\/*}" ]; then
+				LOGFILE="$1"
+			else
 				XERR "$LINENO" "Logfile directory not found."
-			} ;;
+			fi ;;
 		--source|-s)
 			shift
 
-			[ -d "${1%\/*}" ] && SOURCE+=" $1" || {
+			if [ -d "${1%\/*}" ]; then
+				SOURCE+=" $1"
+			else
 				XERR "$LINENO" "Source directory not found."
-			} ;;
+			fi ;;
 		--and-source|-S)
 			shift
 
-			[ -d "${1%\/*}" ] && {
+			if [ -d "${1%\/*}" ]; then
 				ANDSOURCE="true" SOURCE+=( "$1")
-			} || XERR "$LINENO" "Source directory not found." ;;
+			else
+				XERR "$LINENO" "Source directory not found."
+			fi ;;
 		*)
 			break ;;
 	esac
@@ -141,25 +144,34 @@ USER_PATH(){
 }
 
 # Use either custom path alone, or custom path plus defaults.
-[ -z "$SOURCE" ] && DEFAULT_PATHS || {
-	[ "$ANDSOURCE" == "true" ] && {
+if [ -z "$SOURCE" ]; then
+	DEFAULT_PATHS
+else
+	if [ "$ANDSOURCE" == "true" ]; then
 		DEFAULT_PATHS; USER_PATH
-	} || USER_PATH
-}
+	else
+		USER_PATH
+	fi
+fi
 
 printf "[+%0.7d] SYNCHRONIZING...\n" "$SECONDS"
 /bin/sync 
 
-[ -f "$LOGFILE" ] && {
+if [ -f "$LOGFILE" ]; then
 	readarray REPLY < "$LOGFILE"
 
-	[ -n "${REPLY[*]}" ] && {
+	if [ -n "${REPLY[*]}" ]; then
 		printf "[+%0.7d] SAVING: %s\n" "$SECONDS"\
 			"${TARGET}${BACKNAME}/${LOGFILE//*\/}"
 
-		< "$LOGFILE" > "${TARGET}${BACKNAME}/${LOGFILE//*\/}"
-	} || printf "[+%0.7d] CLEANING: %s\n" "$SECONDS" "$LOGFILE"
-} || XERR "$LINENO" "Logfile not found."
+		READ="$(< $LOGFILE)"
+		printf "%s\n" "$READ" > "${TARGET}${BACKNAME}/${LOGFILE//*\/}"
+	else
+		printf "[+%0.7d] CLEANING: %s\n" "$SECONDS" "$LOGFILE"
+	fi
+else
+	XERR "$LINENO" "Logfile not found."
+fi
 
 #TODO - Add feature to show the line count of the logfile.
 
