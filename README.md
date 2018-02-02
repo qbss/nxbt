@@ -4,8 +4,7 @@ A fork and improvement of the XBT program written by Joe Collins.
 **MASTER** - _Hopefully stable branch._\
 **DEV** - _Development Branch (latest changes)_
 
-INTRODUCTION
-------------
+## INTRODUCTION
 
 This is somewhat of a fork of XBT, written by Joe Collins on October 4th, 2017:
 
@@ -24,7 +23,6 @@ Tested as working on Linux Mint 18.2 with the Mate desktop environment.
 > 
 > …And away we go!
 
-INSTALLATION
-------------
+## INSTALLATION
 
 Visit the installit repository to use the easy-to-use TFL downloader.
