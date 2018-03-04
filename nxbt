@@ -3,38 +3,31 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Mon 29 Jan 23:51:34 GMT 2018
+# Last Change       - Sun  4 Mar 20:24:54 GMT 2018
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
+
+_VERSION_="2018-03-04"
 
 declare -i SECONDS=0
 
 XERR(){ printf "[L%0.4d] ERROR: %s\n" "$1" "$2" 1>&2; exit 1; }
 ERR(){ printf "[L%0.4d] ERROR: %s\n" "$1" "$2" 1>&2; }
 
-declare -i DEPCOUNT=0
-for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
-	[ -x "$DEP" ] || {
-		ERR "$LINENO" "Dependency '$DEP' not met."
-		DEPCOUNT+=1
-	}
-}
-
-[ $DEPCOUNT -eq 0 ] || exit 1
-
 USAGE(){
 	while read -r; do
 		printf "%s\n" "$REPLY"
 	done <<-EOF
-		            NXBT - NEW XBT (29th January 2018)
+		            NXBT - NEW XBT ($_VERSION_)
 		            Written by terminalforlife (terminalforlife@yahoo.com)
-		
+
 		            A fork and improvement of the XBT program written by Joe Collins.
 
 		SYNTAX:     nxbt [OPTS] TARGET
-		
+
 		OPTS:       --help|-h|-?            - Displays this help information.
+		            --version|-v            - Output only the version datestamp.
 		            --debug                 - Enables the built-in bash debugging.
 		            --quiet|-q              - Runs in quiet mode. Errors still output.
 		            --log|-l PATH           - Choose a different location for the logfile.
@@ -54,6 +47,9 @@ while [ "$1" ]; do
 	case "$1" in
 		--help|-h|-\?)
 			USAGE; exit 0 ;;
+		--version|-v)
+			printf "%s\n" "$_VERSION_"
+			exit 0 ;;
 		--debug)
 			DEBUGME="true" ;;
 		--quiet|-q)
@@ -88,6 +84,16 @@ while [ "$1" ]; do
 
 	shift
 done
+
+declare -i DEPCOUNT=0
+for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
+	[ -x "$DEP" ] || {
+		ERR "$LINENO" "Dependency '$DEP' not met."
+		DEPCOUNT+=1
+	}
+}
+
+[ $DEPCOUNT -eq 0 ] || exit 1
 
 #XERR "$LINENO" "Incorrect option(s) specified." ;;
 [ "$BEQUIET" == "true" ] && exec 1> /dev/null
@@ -155,7 +161,7 @@ else
 fi
 
 printf "[+%0.7d] SYNCHRONIZING...\n" "$SECONDS"
-/bin/sync 
+/bin/sync
 
 if [ -f "$LOGFILE" ]; then
 	readarray REPLY < "$LOGFILE"
@@ -186,3 +192,5 @@ done <<-EOF
 	TIME: ${SECONDS:-???}s
 	LINE: ${ERRCOUNT:-???}
 EOF
+
+# vim: noexpandtab colorcolumn=84 tabstop=8 noswapfile nobackup
