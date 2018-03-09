@@ -3,12 +3,12 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Sun  4 Mar 20:24:54 GMT 2018
+# Last Change       - Thu  8 Mar 21:47:04 GMT 2018
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
 
-_VERSION_="2018-03-04"
+_VERSION_="2018-03-08"
 
 declare -i SECONDS=0
 
@@ -81,23 +81,22 @@ while [ "$1" ]; do
 		*)
 			break ;;
 	esac
-
 	shift
 done
 
 declare -i DEPCOUNT=0
 for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
-	[ -x "$DEP" ] || {
+	if ! [ -x "$DEP" ]; then
 		ERR "$LINENO" "Dependency '$DEP' not met."
 		DEPCOUNT+=1
-	}
+	fi
 }
 
 [ $DEPCOUNT -eq 0 ] || exit 1
 
 #XERR "$LINENO" "Incorrect option(s) specified." ;;
 [ "$BEQUIET" == "true" ] && exec 1> /dev/null
-[ "$DEBUGME" == "true" ] && set -xeu
+[ "$DEBUGME" == "true" ] && set -x
 
 [ -d "$*" ] || XERR "$LINENO" "Unable to find or access the TARGET directory."
 
@@ -150,7 +149,7 @@ USER_PATH(){
 }
 
 # Use either custom path alone, or custom path plus defaults.
-if [ -z "$SOURCE" ]; then
+if ! [ "$SOURCE" ]; then
 	DEFAULT_PATHS
 else
 	if [ "$ANDSOURCE" == "true" ]; then
