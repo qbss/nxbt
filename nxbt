@@ -3,12 +3,12 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Thu  8 Mar 21:47:04 GMT 2018
+# Last Change       - Wed  4 Apr 09:07:37 BST 2018
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
 
-_VERSION_="2018-03-08"
+_VERSION_="2018-04-04"
 
 declare -i SECONDS=0
 
@@ -28,8 +28,8 @@ USAGE(){
 
 		OPTS:       --help|-h|-?            - Displays this help information.
 		            --version|-v            - Output only the version datestamp.
-		            --debug                 - Enables the built-in bash debugging.
 		            --quiet|-q              - Runs in quiet mode. Errors still output.
+		            --debug|-D              - Enables the built-in bash debugging.
 		            --log|-l PATH           - Choose a different location for the logfile.
 		            --source|-s PATH        - Choose a different location to back up.
 		            --and-source|-S PATH    - Custom source to back up, with the defaults.
@@ -39,7 +39,7 @@ USAGE(){
 
 		              nxbt /media/\$USER/Backup_Drive/
 
-		FILE:       By default, errors are redirected to: /tmp/nxbt_\$USER_\$$.log
+		FILE:       By default, errors are redirected to: /tmp/nxbt_*.log
 	EOF
 }
 
@@ -50,13 +50,12 @@ while [ "$1" ]; do
 		--version|-v)
 			printf "%s\n" "$_VERSION_"
 			exit 0 ;;
-		--debug)
-			DEBUGME="true" ;;
 		--quiet|-q)
 			BEQUIET="true" ;;
+		--debug|-D)
+			DEBUGME="true" ;;
 		--logfile|-l)
 			shift
-
 			if [ -d "${1%\/*}" ]; then
 				LOGFILE="$1"
 			else
@@ -64,7 +63,6 @@ while [ "$1" ]; do
 			fi ;;
 		--source|-s)
 			shift
-
 			if [ -d "${1%\/*}" ]; then
 				SOURCE+=" $1"
 			else
@@ -72,7 +70,6 @@ while [ "$1" ]; do
 			fi ;;
 		--and-source|-S)
 			shift
-
 			if [ -d "${1%\/*}" ]; then
 				ANDSOURCE="true" SOURCE+=( "$1")
 			else
@@ -108,16 +105,16 @@ printf -v CURDATE "%(%F_%X)T" "-1"
 #TODO - Make the logfile skip the whole /tmp part; redundant.
 LOGFILE="/tmp/nxbt_${USER}_${CURDATE}.log"
 BACKNAME="NXBT_${UID}_${CURDATE}"
-[ -d "$BACKNAME" ] || /bin/mkdir "${TARGET}${BACKNAME}"
+if ! [ -d "$BACKNAME" ]; then
+	/bin/mkdir "${TARGET}${BACKNAME}" || exit $?
+fi
 
-# Saves some useful information into the logfile.
 printf "[+%0.7d] LOGGING: %s\n" "$SECONDS" "$LOGFILE"
 printf "[%s]: TARGET='%s' FROM='%s' USER='%s' UID='%s'\n"\
 	"${CURDATE:-???}" "${TARGET:-???}" "${HOSTNAME:-???}"\
 	"${USER:-???}" "${UID:-???}" > "$LOGFILE"
 
 DEFAULT_PATHS(){
-	# Back up home files.
 	printf "[+%0.7d] PROCESSING: %s\n" "$SECONDS" "$HOME"
 	TARGETPATH="${TARGET}${BACKNAME}/$USER/"
 	[ -d "$TARGETPATH" ] || /bin/mkdir "$TARGETPATH"
@@ -125,7 +122,6 @@ DEFAULT_PATHS(){
 	/usr/bin/rsync -a --delete --info=progress2\
 		"$HOME" "$TARGETPATH" 2> "$LOGFILE"
 
-	# Back up etc files.
 	printf "[+%0.7d] PROCESSING: %s\n" "$SECONDS" "/etc"
 	TARGETPATH="${TARGET}${BACKNAME}/etc/"
 	[ -d "$TARGETPATH" ] || /bin/mkdir "$TARGETPATH"
@@ -164,8 +160,7 @@ printf "[+%0.7d] SYNCHRONIZING...\n" "$SECONDS"
 
 if [ -f "$LOGFILE" ]; then
 	readarray REPLY < "$LOGFILE"
-
-	if [ -n "${REPLY[*]}" ]; then
+	if [ "${REPLY[*]}" ]; then
 		printf "[+%0.7d] SAVING: %s\n" "$SECONDS"\
 			"${TARGET}${BACKNAME}/${LOGFILE//*\/}"
 
@@ -178,7 +173,10 @@ else
 	XERR "$LINENO" "Logfile not found."
 fi
 
-#TODO - Add feature to show the line count of the logfile.
+if [ -f "$LOGFILE" ]; then
+	readarray X < "$LOGFILE"
+	declare -i ERRCOUNT=${#X[@]}
+fi
 
 while read -r; do
 	printf "%s\n" "$REPLY"
@@ -192,4 +190,4 @@ done <<-EOF
 	LINE: ${ERRCOUNT:-???}
 EOF
 
-# vim: noexpandtab colorcolumn=84 tabstop=8 noswapfile nobackup
+# vim: ft=sh noexpandtab colorcolumn=84 tabstop=8 noswapfile nobackup
