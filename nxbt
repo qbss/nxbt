@@ -3,17 +3,19 @@
 #----------------------------------------------------------------------------------
 # Project Name      - miscellaneous/nxbt
 # Started On        - Fri  6 Oct 17:52:55 BST 2017
-# Last Change       - Wed  4 Apr 09:07:37 BST 2018
+# Last Change       - Sat  7 Apr 19:13:41 BST 2018
 # Author E-Mail     - terminalforlife@yahoo.com
 # Author GitHub     - https://github.com/terminalforlife
 #----------------------------------------------------------------------------------
 
-_VERSION_="2018-04-04"
+_VERSION_="2018-04-07"
 
 declare -i SECONDS=0
 
 XERR(){ printf "[L%0.4d] ERROR: %s\n" "$1" "$2" 1>&2; exit 1; }
 ERR(){ printf "[L%0.4d] ERROR: %s\n" "$1" "$2" 1>&2; }
+
+DOM="https://github.com"
 
 USAGE(){
 	while read -r; do
@@ -29,6 +31,7 @@ USAGE(){
 		OPTS:       --help|-h|-?            - Displays this help information.
 		            --version|-v            - Output only the version datestamp.
 		            --quiet|-q              - Runs in quiet mode. Errors still output.
+		            --update|-U             - Check for updates to simplify-ubuntu.
 		            --debug|-D              - Enables the built-in bash debugging.
 		            --log|-l PATH           - Choose a different location for the logfile.
 		            --source|-s PATH        - Choose a different location to back up.
@@ -40,6 +43,8 @@ USAGE(){
 		              nxbt /media/\$USER/Backup_Drive/
 
 		FILE:       By default, errors are redirected to: /tmp/nxbt_*.log
+
+		SITE:       $DOM/terminalforlife/nxbt
 	EOF
 }
 
@@ -52,6 +57,8 @@ while [ "$1" ]; do
 			exit 0 ;;
 		--quiet|-q)
 			BEQUIET="true" ;;
+		--update|-U)
+			UPDATE="true" ;;
 		--debug|-D)
 			DEBUGME="true" ;;
 		--logfile|-l)
@@ -82,7 +89,7 @@ while [ "$1" ]; do
 done
 
 declare -i DEPCOUNT=0
-for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
+for DEP in /usr/bin/{wget,rsync} /bin/{mkdir,sync}; {
 	if ! [ -x "$DEP" ]; then
 		ERR "$LINENO" "Dependency '$DEP' not met."
 		DEPCOUNT+=1
@@ -90,6 +97,31 @@ for DEP in /usr/bin/rsync /bin/{mkdir,sync}; {
 }
 
 [ $DEPCOUNT -eq 0 ] || exit 1
+
+read -a WGET_VER_LINE <<< "$(/usr/bin/wget --version)"
+WGET_VERSION=0${WGET_VER_LINE[2]//[!0-9]}
+if [ $WGET_VERSION -ge 01192 -a $WGET_VERSION -lt 01194 ]; then
+	NOWARC="--no-warc-compression"
+fi
+
+if [ "$UPDATE" == "true" ]; then
+	VERSION_URL="$DOM/terminalforlife/nxbt/raw/master/version"
+	LATEST=`/usr/bin/wget $NOWARC -q "$VERSION_URL" -O -`
+	if [[ "${LATEST//-}" =~ ^[0-9]{8}$ ]]; then
+		if [ ${LATEST//-} -gt ${_VERSION_//-} ]; then
+			while read -r; do
+				printf "%s\n" "$REPLY"
+			done <<-EOF
+				New version available:    $LATEST
+				Current version:          $_VERSION_
+			EOF
+		fi
+	else
+		XERR "$LINENO" "Failed to check for available updates."
+	fi
+
+	exit 0
+fi
 
 #XERR "$LINENO" "Incorrect option(s) specified." ;;
 [ "$BEQUIET" == "true" ] && exec 1> /dev/null
