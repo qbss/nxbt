@@ -34,8 +34,6 @@ USAGE(){
 		            --update|-U             - Check for updates to simplify-ubuntu.
 		            --debug|-D              - Enables the built-in bash debugging.
 		            --log|-l PATH           - Choose a different location for the logfile.
-		            --source|-s PATH        - Choose a different location to back up.
-		            --and-source|-S PATH    - Custom source to back up, with the defaults.
 
 		NOTE:       Where TARGET is the location to store the backed up files. The files
 		            will be stored within a timestamped directory. An example TARGET:
@@ -47,6 +45,9 @@ USAGE(){
 		SITE:       $DOM/terminalforlife/nxbt
 	EOF
 }
+
+#		            --source|-s PATH        - Choose a different location to back up.
+#		            --and-source|-S PATH    - Custom source to back up, with the defaults.
 
 while [ "$1" ]; do
 	case "$1" in
@@ -68,20 +69,20 @@ while [ "$1" ]; do
 			else
 				XERR "$LINENO" "Logfile directory not found."
 			fi ;;
-		--source|-s)
-			shift
-			if [ -d "${1%\/*}" ]; then
-				SOURCE+=" $1"
-			else
-				XERR "$LINENO" "Source directory not found."
-			fi ;;
-		--and-source|-S)
-			shift
-			if [ -d "${1%\/*}" ]; then
-				ANDSOURCE="true" SOURCE+=( "$1")
-			else
-				XERR "$LINENO" "Source directory not found."
-			fi ;;
+#		--source|-s)
+#			shift
+#			if [ -d "${1%\/*}" ]; then
+#				SOURCE+=" $1"
+#			else
+#				XERR "$LINENO" "Source directory not found."
+#			fi ;;
+#		--and-source|-S)
+#			shift
+#			if [ -d "${1%\/*}" ]; then
+#				ANDSOURCE="true" SOURCE+=( "$1")
+#			else
+#				XERR "$LINENO" "Source directory not found."
+#			fi ;;
 		*)
 			break ;;
 	esac
